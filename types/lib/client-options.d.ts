@@ -4,6 +4,7 @@ import { ClientOptions } from 'ws'
 import { ClientRequestArgs } from 'http'
 import { QoS, UserProperties } from 'mqtt-packet'
 import { IMessageIdProvider } from './message-id-provider'
+import { LookupFunction } from 'net'
 
 export declare type StorePutCallback = () => void
 
@@ -43,6 +44,10 @@ export interface IClientOptions extends ISecureClientOptions {
    * 30 * 1000 milliseconds, time to wait before a CONNACK is received
    */
   connectTimeout?: number
+  /**
+   * Custom lookup function. Default: dns.lookup()
+   */
+  lookup?: LookupFunction
   /**
    * the username required by your broker, if any
    */

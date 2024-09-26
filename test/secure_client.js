@@ -2,6 +2,7 @@
 
 const mqtt = require('..')
 const path = require('path')
+const dns = require('dns')
 const abstractClientTests = require('./abstract_client')
 const fs = require('fs')
 const port = 9899
@@ -123,6 +124,32 @@ describe('MqttSecureClient', function () {
       })
 
       server.once('connect', function () {
+        done()
+      })
+    })
+
+    it('should use custom lookup function to resolve hostname', function (done) {
+      const sinon = require('sinon')
+      const lookup = sinon.stub()
+      lookup.callsFake(function (p1, p2, p3) {
+        dns.lookup(p1, p2, p3)
+      })
+
+      const hostname = 'localhost'
+      const client = mqtt.connect({
+        protocol: 'mqtts',
+        port: port,
+        host: hostname,
+        lookup: lookup,
+        ca: [fs.readFileSync(CERT)]
+      })
+
+      client.on('error', function (err) {
+        done(err)
+      })
+
+      server.once('connect', function () {
+        assert.strictEqual(lookup.callCount, 1, 'lookup should be called once')
         done()
       })
     })
